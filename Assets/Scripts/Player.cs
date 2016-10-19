@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 [RequireComponent (typeof (Controller2D))]
 public class Player : MonoBehaviour {
@@ -36,6 +37,10 @@ public class Player : MonoBehaviour {
 		controller = GetComponent<Controller2D>();
 
 		gravity = -(2 * maxJumpHeight)/Mathf.Pow(timeToJumpApex, 2);
+
+		// save a reference to gravity
+		controller.collisions.gravity = gravity;
+
 		maxJumpVelocity = Mathf.Abs( gravity * timeToJumpApex );
 		minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
 	}
@@ -72,8 +77,23 @@ public class Player : MonoBehaviour {
 
 		}
 
+		if (controller.collisions.hanging) {
+//			if (velocity.y >= 0f) {
+			// turn off gravity OR adjust velocity.y ???? when climbing/hnaging
+//			velocity.y += Math.Abs (gravity * Time.deltaTime);
+//				Debug.Log("invert gravity");
+//			    velocity.y = -0.1f;
+				gravity = -gravity;
+//			}
+		}
 
 		if (Input.GetButtonDown ("Jump")) {
+			// turn off climbing / hanging
+			if (controller.collisions.hanging) {
+				controller.collisions.hanging = false;
+				gravity = -gravity;
+			}
+
 			if (wallSliding) {
 				if (wallDirX == input.x) {
 					velocity.x = -wallDirX * wallJumpClimb.x;

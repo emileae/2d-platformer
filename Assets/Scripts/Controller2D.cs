@@ -33,9 +33,13 @@ public class Controller2D : RaycastController {
 			collisions.faceDir = (int)Mathf.Sign(velocity.x);// cast MAthf.Sign to an integer, its normally a float
 		}
 
-		if (velocity.y < 0) {
+		if (velocity.y < 0 && !collisions.hanging) {
 			DescendSlope (ref velocity);
 		}
+
+//		if (velocity.y < 0 && collisions.hanging) {
+//			DescendOverhang (ref velocity);
+//		}
 
 		HorizontalCollisions (ref velocity);	
 
@@ -146,18 +150,18 @@ public class Controller2D : RaycastController {
 
 				if (hit.collider.tag == "Through") {
 					if (directionY == 1 || hit.distance == 0) {
-						Debug.Log("Fall Through... going up and 0 hit distance");
-						Debug.Log(collisions.below);
+						Debug.Log ("Fall Through... going up and 0 hit distance");
+						Debug.Log (collisions.below);
 						continue;// skip this case adn don't handle the collision
 					}
 					if (collisions.fallingThroughPlatform) {
-						Debug.Log("Fall Through... still timing out");
+						Debug.Log ("Fall Through... still timing out");
 						continue;
 					}
 					if (playerInput.y == -1) {
-						Debug.Log("Fall Through... pressed down");
+						Debug.Log ("Fall Through... pressed down");
 						collisions.fallingThroughPlatform = true;
-						Invoke("ResetFallingThroughPlatform", 0.1f);
+						Invoke ("ResetFallingThroughPlatform", 0.1f);
 						continue;
 					}
 				}
@@ -171,6 +175,17 @@ public class Controller2D : RaycastController {
 
 				collisions.below = directionY == -1;
 				collisions.above = directionY == 1;
+
+				if (hit.collider.tag == "Climbable" && directionY == 1) {
+					Debug.Log("Hit a climbable surface");
+					collisions.hanging = true;
+				}else if (directionY == 1){
+					collisions.hanging = false;
+				}
+
+				Debug.Log("collisions.above......");
+				Debug.Log(collisions.above);
+				Debug.Log(collisions.below);
 			}
 
 		}
@@ -190,6 +205,51 @@ public class Controller2D : RaycastController {
 			}
 		}
 
+	}
+
+// Navigate overhangs like slopes just the other way around
+//	void ClimbOverhang (ref Vector3 velocity, float slopeAngle)
+//	{
+//		// adjusting speed in x direction according to slope angle and slope distance
+//		float moveDistance = Mathf.Abs (velocity.x);
+//
+//		// dont want to directly set velocity.y bc it interferes with jumping
+//		float climbVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
+//
+//		// assume we're jumping if velocity Y is > climbing velocity
+//		if (velocity.y <= climbVelocityY) {
+//			velocity.y = climbVelocityY;
+//			velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+//			// need to set collisions.below to TRUE, to indicate that despite moving up we're still grounded
+//			collisions.above = true;
+//			collisions.climbingSlope = true;
+//			collisions.slopeAngle = slopeAngle;
+//		}
+//	}
+
+	void DescendOverhang (ref Vector3 velocity)
+	{
+		float directionX = Mathf.Sign (velocity.x);
+		Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;
+		RaycastHit2D hit = Physics2D.Raycast (rayOrigin, -Vector2.up, Mathf.Infinity, collisionMask);
+
+		if (hit) {
+			float slopeAngle = Vector2.Angle (hit.normal, Vector2.up);
+			if (slopeAngle != 0 && slopeAngle <= maxDescendAngle) {
+				if ( Mathf.Sign(hit.normal.x) == directionX ) {
+					if (hit.distance - skinWidth <= Mathf.Tan (slopeAngle * Mathf.Deg2Rad) * Mathf.Abs (velocity.x)) {
+						float moveDistance = Mathf.Abs(velocity.x);
+						float descendVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
+						velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+						velocity.y -= descendVelocityY;
+
+						collisions.slopeAngle = slopeAngle;
+						collisions.descendingSlope = true;
+						collisions.below = true;
+					}
+				}
+			}
+		}
 	}
 
 	void ClimbSlope (ref Vector3 velocity, float slopeAngle)
@@ -252,6 +312,8 @@ public class Controller2D : RaycastController {
 		public int faceDir;
 
 		public bool fallingThroughPlatform;
+		public bool hanging;
+		public float gravity;
 
 		public void Reset() {
 			above = below = false;
