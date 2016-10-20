@@ -37,10 +37,6 @@ public class Controller2D : RaycastController {
 			DescendSlope (ref velocity);
 		}
 
-		if (velocity.y < 0 && collisions.hanging) {
-			DescendOverhang (ref velocity);
-		}
-
 		HorizontalCollisions (ref velocity);	
 
 		if (velocity.y != 0) {
@@ -106,6 +102,11 @@ public class Controller2D : RaycastController {
 					velocity.x += distanceToSlopeStart * directionX;
 				}
 
+				// check if hanging / /climbing overhang
+//				if (collisions.hanging && i == (horizontalRayCount - 1)){
+//					DescendOverhang(ref velocity);
+//				}
+
 				if (!collisions.climbingSlope || slopeAngle > maxClimbAngle) {
 					velocity.x = (hit.distance - skinWidth) * directionX;
 					rayLength = hit.distance;
@@ -132,6 +133,8 @@ public class Controller2D : RaycastController {
 		// get direction i.e. +1 or -1
 		float directionY = Mathf.Sign (velocity.y);
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
+
+		Debug.Log ("DirectionY ---------> > > " + directionY);
 
 		for (int i = 0; i < verticalRayCount; i++) {
 			// if moving down then rays need to start in bototm left corner
@@ -166,6 +169,12 @@ public class Controller2D : RaycastController {
 					}
 				}
 
+//				if (hit.collider.tag == "Climbable") {
+////					Debug.Log ("- - - - - - - - - - Hit a climbable surface - - - - - - - - ");
+//					collisions.hanging = true;
+//					collisions.above = true;
+//				}
+
 				velocity.y = (hit.distance - skinWidth) * directionY;
 				rayLength = hit.distance;
 
@@ -176,16 +185,6 @@ public class Controller2D : RaycastController {
 				collisions.below = directionY == -1;
 				collisions.above = directionY == 1;
 
-				if (hit.collider.tag == "Climbable" && directionY == 1) {
-					Debug.Log("Hit a climbable surface");
-					collisions.hanging = true;
-				}else if (directionY == 1){
-					collisions.hanging = false;
-				}
-
-				Debug.Log("collisions.above......");
-				Debug.Log(collisions.above);
-				Debug.Log(collisions.below);
 			}
 
 		}
@@ -207,7 +206,7 @@ public class Controller2D : RaycastController {
 
 	}
 
-// Navigate overhangs like slopes just the other way around
+//// Navigate overhangs like slopes just the other way around
 //	void ClimbOverhang (ref Vector3 velocity, float slopeAngle)
 //	{
 //		// adjusting speed in x direction according to slope angle and slope distance
@@ -226,32 +225,44 @@ public class Controller2D : RaycastController {
 //			collisions.slopeAngle = slopeAngle;
 //		}
 //	}
-
-	void DescendOverhang (ref Vector3 velocity)
-	{
-		float directionX = Mathf.Sign (velocity.x);
-		Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
-		RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up, Mathf.Infinity, collisionMask);
-
-		if (hit) {
-		Debug.Log("Moving down overhanging 'slope' - - - -");
-//			float slopeAngle = Vector2.Angle (hit.normal, Vector2.up);
-//			if (slopeAngle != 0 && slopeAngle <= maxDescendAngle) {
-//				if ( Mathf.Sign(hit.normal.x) == directionX ) {
+//
+//	void DescendOverhang (ref Vector3 velocity)
+//	{
+//		float directionX = Mathf.Sign (velocity.x);
+//		Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.topLeft : raycastOrigins.topRight;
+//		RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up, Mathf.Infinity, collisionMask);
+//
+//		Debug.Log("directionX " + directionX);
+//
+//		if (hit) {
+//
+//			Debug.Log("hit.normal " + Mathf.Sign(hit.normal.x));
+//
+//			float slopeAngle = 180 - Vector2.Angle (hit.normal, Vector2.up);
+//			if (slopeAngle != 0) {
+//				// the inverted normal has opposite sign
+//				if ( Mathf.Sign(hit.normal.x) == -directionX ) {
+//
+//					Debug.Log("##### hit.distance - skinWidth #####" + (hit.distance - skinWidth));
+//					Debug.Log(Mathf.Tan (slopeAngle * Mathf.Deg2Rad) * Mathf.Abs (velocity.x));
+//
 //					if (hit.distance - skinWidth <= Mathf.Tan (slopeAngle * Mathf.Deg2Rad) * Mathf.Abs (velocity.x)) {
 //						float moveDistance = Mathf.Abs(velocity.x);
 //						float descendVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
 //						velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
 //						velocity.y -= descendVelocityY;
 //
-//						collisions.slopeAngle = slopeAngle;
-//						collisions.descendingSlope = true;
-//						collisions.below = true;
+//						Debug.Log("velocity.y - - - - - - - - -. " + velocity.y);
+//
+////						collisions.slopeAngle = slopeAngle;
+//						collisions.descendingOverhang = true;
+//						collisions.above = true;
 //					}
 //				}
 //			}
-		}
-	}
+////			collisions.descendingOverhang = true;
+//		}
+//	}
 
 	void ClimbSlope (ref Vector3 velocity, float slopeAngle)
 	{
@@ -313,14 +324,20 @@ public class Controller2D : RaycastController {
 		public int faceDir;
 
 		public bool fallingThroughPlatform;
+
 		public bool hanging;
 		public float gravity;
+		public bool climbingOverhang;
+		public bool descendingOverhang;
 
 		public void Reset() {
 			above = below = false;
 			left = right = false;
 			climbingSlope = false;
 			descendingSlope = false;
+
+			climbingOverhang = false;
+			descendingOverhang = false;
 
 			slopeAngleOld = slopeAngle;
 			slopeAngle = 0;
