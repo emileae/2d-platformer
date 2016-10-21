@@ -37,6 +37,10 @@ public class Controller2D : RaycastController {
 			DescendSlope (ref velocity);
 		}
 
+		if (velocity.y > 0 && collisions.hanging) {
+			ClimbOverhang (ref velocity);
+		}
+
 		HorizontalCollisions (ref velocity);	
 
 		if (velocity.y != 0) {
@@ -103,9 +107,10 @@ public class Controller2D : RaycastController {
 				}
 
 				// check if hanging / /climbing overhang
-//				if (collisions.hanging && i == (horizontalRayCount - 1)){
-//					DescendOverhang(ref velocity);
-//				}
+				if (collisions.hanging && i == (horizontalRayCount - 1)){
+					float hangingSlopeAngle = 180 - Vector2.Angle (hit.normal, Vector2.up);
+					DescendOverhang(ref velocity, hangingSlopeAngle);
+				}
 
 				if (!collisions.climbingSlope || slopeAngle > maxClimbAngle) {
 					velocity.x = (hit.distance - skinWidth) * directionX;
@@ -134,27 +139,6 @@ public class Controller2D : RaycastController {
 		float directionY = Mathf.Sign (velocity.y);
 		float rayLength = Mathf.Abs (velocity.y) + skinWidth;
 
-		Debug.Log ("rayLength ---------> > > " + rayLength);
-
-//		if (directionY == 1) {
-//			// make a new raycast to look for climbable surfaces
-//			RaycastHit2D climbHit = Physics2D.Raycast (raycastOrigins.topCenter, Vector2.up, rayLength, collisionMask);
-//			Debug.DrawRay (raycastOrigins.topCenter, Vector2.up * rayLength, Color.blue);
-//
-//			if (climbHit) {
-//				Debug.Log ("Raycast hit something < < < < < < < < < <<<<<s");
-//				if (climbHit.collider.tag == "Climbable") {
-//					Debug.Log ("Hit somehting climbable < < < < < < < < < <<<<<");
-//					collisions.hanging = true;
-//				} else {
-//					Debug.Log ("No longer climbable - - - - - - ------------<");
-//					collisions.hanging = false;
-//				}
-//			}
-//
-//		}
-
-//		bool hitClimbableSurface = false;
 
 		for (int i = 0; i < verticalRayCount; i++) {
 			// if moving down then rays need to start in bototm left corner
@@ -199,11 +183,7 @@ public class Controller2D : RaycastController {
 				collisions.below = directionY == -1;
 				collisions.above = directionY == 1;
 
-				// reset the climbable surface
-//				hitClimbableSurface = false;
 				if (collisions.above && hit.collider.tag == "Climbable") {
-					Debug.Log ("- - - - - - - - - - Hit a climbable surface - - - - - - - - ");
-//					hitClimbableSurface = true;
 					collisions.hanging = true;
 				}
 
@@ -234,62 +214,53 @@ public class Controller2D : RaycastController {
 	}
 
 //// Navigate overhangs like slopes just the other way around
-//	void ClimbOverhang (ref Vector3 velocity, float slopeAngle)
-//	{
-//		// adjusting speed in x direction according to slope angle and slope distance
-//		float moveDistance = Mathf.Abs (velocity.x);
+	void ClimbOverhang (ref Vector3 velocity)
+	{
+		float directionX = Mathf.Sign (velocity.x);
+		Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.topRight : raycastOrigins.topLeft;
+		RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up, Mathf.Infinity, collisionMask);
+		if (hit) {
+			float slopeAngle = 180 - Vector2.Angle (hit.normal, Vector2.up);
+			if (slopeAngle != 0 ) {
+				if ( Mathf.Sign(hit.normal.x) == directionX ) {
+					if (hit.distance - skinWidth <= Mathf.Tan (slopeAngle * Mathf.Deg2Rad) * Mathf.Abs (velocity.x)) {
+						float moveDistance = Mathf.Abs(velocity.x);
+						float climbVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
+
+						velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+						velocity.y += climbVelocityY;
+
+//						collisions.slopeAngle = slopeAngle;
+						collisions.climbingOverhang = true;
+						collisions.above = true;
+					}
+				}
+			}
+		}
+	}
 //
-//		// dont want to directly set velocity.y bc it interferes with jumping
-//		float climbVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
-//
+	void DescendOverhang (ref Vector3 velocity, float slopeAngle)
+	{
+		// adjusting speed in x direction according to sslope angle adn slope distance
+		float moveDistance = Mathf.Abs (velocity.x);
+
+		// dont want to directly set velocity.y bc it interferes with jumping
+		float climbVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
+
+		velocity.y = -climbVelocityY;
+		velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
+		collisions.descendingOverhang = true;
+
 //		// assume we're jumping if velocity Y is > climbing velocity
 //		if (velocity.y <= climbVelocityY) {
 //			velocity.y = climbVelocityY;
 //			velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
 //			// need to set collisions.below to TRUE, to indicate that despite moving up we're still grounded
-//			collisions.above = true;
+//			collisions.below = true;
 //			collisions.climbingSlope = true;
 //			collisions.slopeAngle = slopeAngle;
 //		}
-//	}
-//
-//	void DescendOverhang (ref Vector3 velocity)
-//	{
-//		float directionX = Mathf.Sign (velocity.x);
-//		Vector2 rayOrigin = (directionX == -1) ? raycastOrigins.topLeft : raycastOrigins.topRight;
-//		RaycastHit2D hit = Physics2D.Raycast (rayOrigin, Vector2.up, Mathf.Infinity, collisionMask);
-//
-//		Debug.Log("directionX " + directionX);
-//
-//		if (hit) {
-//
-//			Debug.Log("hit.normal " + Mathf.Sign(hit.normal.x));
-//
-//			float slopeAngle = 180 - Vector2.Angle (hit.normal, Vector2.up);
-//			if (slopeAngle != 0) {
-//				// the inverted normal has opposite sign
-//				if ( Mathf.Sign(hit.normal.x) == -directionX ) {
-//
-//					Debug.Log("##### hit.distance - skinWidth #####" + (hit.distance - skinWidth));
-//					Debug.Log(Mathf.Tan (slopeAngle * Mathf.Deg2Rad) * Mathf.Abs (velocity.x));
-//
-//					if (hit.distance - skinWidth <= Mathf.Tan (slopeAngle * Mathf.Deg2Rad) * Mathf.Abs (velocity.x)) {
-//						float moveDistance = Mathf.Abs(velocity.x);
-//						float descendVelocityY = Mathf.Sin (slopeAngle * Mathf.Deg2Rad) * moveDistance;
-//						velocity.x = Mathf.Cos(slopeAngle*Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
-//						velocity.y -= descendVelocityY;
-//
-//						Debug.Log("velocity.y - - - - - - - - -. " + velocity.y);
-//
-////						collisions.slopeAngle = slopeAngle;
-//						collisions.descendingOverhang = true;
-//						collisions.above = true;
-//					}
-//				}
-//			}
-////			collisions.descendingOverhang = true;
-//		}
-//	}
+	}
 
 	void ClimbSlope (ref Vector3 velocity, float slopeAngle)
 	{

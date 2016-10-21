@@ -85,7 +85,7 @@ public class Player : MonoBehaviour {
 			velocity.y = pullVelocity - (gravity * Time.deltaTime);
 
 			if (!controller.collisions.above) {
-				Debug.Log("+++++++++++++++++++++++++++++++++++++++++++ NO ABOVE");
+//				Debug.Log ("+++++++++++++++++++++++++++++++++++++++++++ NO ABOVE");
 				controller.collisions.hanging = false;
 			}
 
@@ -94,6 +94,10 @@ public class Player : MonoBehaviour {
 		if (Input.GetButtonDown ("Jump")) {
 			// turn off climbing / hanging
 			if (controller.collisions.hanging) {
+				// can still improve dismount while descending overhang
+				if (controller.collisions.descendingOverhang) {
+					velocity.x -= 0f;
+				}
 				velocity.y -= releaseHangVelocity;
 				controller.collisions.hanging = false;
 			}
