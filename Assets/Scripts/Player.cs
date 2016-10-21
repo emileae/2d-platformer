@@ -80,20 +80,13 @@ public class Player : MonoBehaviour {
 
 		}
 
-//		Debug.Log ("----------> velocity.x? " + velocity.x);
-//		Debug.Log ("----------> velocity.y? " + velocity.y);
-//		Debug.Log ("----------> above? " + controller.collisions.above);
-//		Debug.Log ("----------> below? " + controller.collisions.below);
-//		Debug.Log ("----------> left? " + controller.collisions.left);
-//		Debug.Log ("----------> right? " + controller.collisions.right);
 		if (controller.collisions.hanging) {
-			// first stop moving, then start pulling up = pull up to cancel gravity plus some
-			velocity.y = 0f - (gravity * Time.deltaTime);
+			// cancel gravity and pull up slightly to keep collisions.above
+			velocity.y = pullVelocity - (gravity * Time.deltaTime);
 
 			if (!controller.collisions.above) {
-//				Debug.Log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=> lost grip");
+				Debug.Log("+++++++++++++++++++++++++++++++++++++++++++ NO ABOVE");
 				controller.collisions.hanging = false;
-//				Debug.Break();
 			}
 
 		}
@@ -101,11 +94,8 @@ public class Player : MonoBehaviour {
 		if (Input.GetButtonDown ("Jump")) {
 			// turn off climbing / hanging
 			if (controller.collisions.hanging) {
-//				Debug.Log("====================> stop hanging by jumping");
-				// push player away from climbable surface by applying a velocity
 				velocity.y -= releaseHangVelocity;
 				controller.collisions.hanging = false;
-//				gravity = -gravity;
 			}
 
 			if (wallSliding) {

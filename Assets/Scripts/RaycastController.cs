@@ -34,7 +34,7 @@ public class RaycastController : MonoBehaviour {
 		raycastOrigins.topLeft = new Vector2 (bounds.min.x, bounds.max.y);
 		raycastOrigins.topRight = new Vector2 (bounds.max.x, bounds.max.y);
 
-		raycastOrigins.topCenter = new Vector2 (bounds.max.x/2, bounds.max.y);
+		raycastOrigins.topCenter = new Vector2 (bounds.center.x, bounds.max.y);
 	}
 
 	public void CalculateRaySpacing() {

@@ -136,20 +136,25 @@ public class Controller2D : RaycastController {
 
 		Debug.Log ("rayLength ---------> > > " + rayLength);
 
-		if (directionY == 1) {
-//			Debug.Log("^^^^^^^^^^^^^^^^^^^ moving up ^^^^^^^^^^^^^^^^^");
-			// make a new raycast to look for climbable surfaces
-			RaycastHit2D climbHit = Physics2D.Raycast (raycastOrigins.topCenter, Vector2.up, rayLength, collisionMask);
+//		if (directionY == 1) {
+//			// make a new raycast to look for climbable surfaces
+//			RaycastHit2D climbHit = Physics2D.Raycast (raycastOrigins.topCenter, Vector2.up, rayLength, collisionMask);
+//			Debug.DrawRay (raycastOrigins.topCenter, Vector2.up * rayLength, Color.blue);
+//
+//			if (climbHit) {
+//				Debug.Log ("Raycast hit something < < < < < < < < < <<<<<s");
+//				if (climbHit.collider.tag == "Climbable") {
+//					Debug.Log ("Hit somehting climbable < < < < < < < < < <<<<<");
+//					collisions.hanging = true;
+//				} else {
+//					Debug.Log ("No longer climbable - - - - - - ------------<");
+//					collisions.hanging = false;
+//				}
+//			}
+//
+//		}
 
-			if (climbHit) {
-				Debug.Log ("Raycast hit something < < < < < < < < < <<<<<s");
-				if (climbHit.collider.tag == "Climbable") {
-					Debug.Log("Hit somehting climbable < < < < < < < < < <<<<<");
-					collisions.hanging = true;
-				}
-			}
-
-		}
+//		bool hitClimbableSurface = false;
 
 		for (int i = 0; i < verticalRayCount; i++) {
 			// if moving down then rays need to start in bototm left corner
@@ -184,12 +189,6 @@ public class Controller2D : RaycastController {
 					}
 				}
 
-//				if (hit.collider.tag == "Climbable") {
-////					Debug.Log ("- - - - - - - - - - Hit a climbable surface - - - - - - - - ");
-//					collisions.hanging = true;
-//					collisions.above = true;
-//				}
-
 				velocity.y = (hit.distance - skinWidth) * directionY;
 				rayLength = hit.distance;
 
@@ -200,9 +199,22 @@ public class Controller2D : RaycastController {
 				collisions.below = directionY == -1;
 				collisions.above = directionY == 1;
 
+				// reset the climbable surface
+//				hitClimbableSurface = false;
+				if (collisions.above && hit.collider.tag == "Climbable") {
+					Debug.Log ("- - - - - - - - - - Hit a climbable surface - - - - - - - - ");
+//					hitClimbableSurface = true;
+					collisions.hanging = true;
+				}
+
 			}
 
 		}
+
+//		// double check that are on a climbable surface, outside the loop
+//		if (!hitClimbableSurface) {
+//			collisions.hanging = false;
+//		}
 
 		if (collisions.climbingSlope) {
 			float directionX = Mathf.Sign (velocity.x);
