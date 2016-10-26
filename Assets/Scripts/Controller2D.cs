@@ -30,7 +30,7 @@ public class Controller2D : RaycastController {
 		playerInput = input;
 
 		if (velocity.x != 0) {
-			collisions.faceDir = (int)Mathf.Sign(velocity.x);// cast MAthf.Sign to an integer, its normally a float
+			collisions.faceDir = (int)Mathf.Sign (velocity.x);// cast MAthf.Sign to an integer, its normally a float
 		}
 
 		if (velocity.y < 0 && !collisions.hanging) {
@@ -52,6 +52,18 @@ public class Controller2D : RaycastController {
 
 		if (standingOnPlatform) {
 			collisions.below = true;
+		}
+
+		if (velocity.x > 0) {
+			collisions.walkingRight = true;
+		}
+		if (velocity.x < 0) {
+			collisions.walkingLeft = true;
+		}
+
+		if (velocity.x == 0) {
+			collisions.walkingRight = false;
+			collisions.walkingLeft = false;
 		}
 
 	}
@@ -316,6 +328,9 @@ public class Controller2D : RaycastController {
 		public bool climbingSlope;
 		public bool descendingSlope;
 
+		public bool walkingLeft;
+		public bool walkingRight;
+
 		public float slopeAngle, slopeAngleOld;
 		public Vector3 velocityOld;
 
@@ -333,6 +348,9 @@ public class Controller2D : RaycastController {
 			left = right = false;
 			climbingSlope = false;
 			descendingSlope = false;
+
+			walkingLeft = false;
+			walkingRight = false;
 
 			climbingOverhang = false;
 			descendingOverhang = false;

@@ -5,9 +5,9 @@ using System;
 [RequireComponent (typeof (Controller2D))]
 public class Player : MonoBehaviour {
 
-	public float maxJumpHeight = 4;
-	public float minJumpHeight = 1;
-	public float timeToJumpApex = 0.4f;
+	public float maxJumpHeight = 1;
+	public float minJumpHeight = 0.2f;
+	public float timeToJumpApex = 0.2f;
 	float gravity;
 	float maxJumpVelocity;
 	float minJumpVelocity;
@@ -30,10 +30,12 @@ public class Player : MonoBehaviour {
 	float accelerationTimeGrounded = 0.1f;
 	float velocityXSmoothing;
 
-	float moveSpeed = 6f;
+	float moveSpeed = 2f;
 	Vector3 velocity;
 
 	Controller2D controller;
+
+	Animator anim;
 
 	// Use this for initialization
 	void Start () {
@@ -46,6 +48,9 @@ public class Player : MonoBehaviour {
 
 		maxJumpVelocity = Mathf.Abs( gravity * timeToJumpApex );
 		minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
+
+		// animator reference
+		anim = GetComponent<Animator>();
 	}
 
 	void Update ()
@@ -129,6 +134,14 @@ public class Player : MonoBehaviour {
 //		velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
 		velocity.y += gravity * Time.deltaTime;
 		controller.Move (velocity * Time.deltaTime, input);
+
+		Debug.Log ("isWalking?????????????????" + controller.collisions.walkingRight);
+
+		if (controller.collisions.walkingLeft || controller.collisions.walkingRight) {
+			anim.SetBool ("isWalking", true);
+		} else {
+			anim.SetBool ("isWalking", false);
+		}
 
 		if (controller.collisions.above || controller.collisions.below) {
 			velocity.y = 0;
