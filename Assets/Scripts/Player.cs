@@ -5,8 +5,8 @@ using System;
 [RequireComponent (typeof (Controller2D))]
 public class Player : MonoBehaviour {
 
-	public float maxJumpHeight = 1;
-	public float minJumpHeight = 0.2f;
+	public float maxJumpHeight = 1f;
+	public float minJumpHeight = 0.1f;
 	public float timeToJumpApex = 0.2f;
 	float gravity;
 	float maxJumpVelocity;
@@ -30,12 +30,14 @@ public class Player : MonoBehaviour {
 	float accelerationTimeGrounded = 0.1f;
 	float velocityXSmoothing;
 
-	float moveSpeed = 2f;
+	float moveSpeed = 0.5f;
+	float minWalkSpeed = 0.0001f;
 	Vector3 velocity;
 
 	Controller2D controller;
 
 	Animator anim;
+	SpriteRenderer sprite;
 
 	// Use this for initialization
 	void Start () {
@@ -51,6 +53,8 @@ public class Player : MonoBehaviour {
 
 		// animator reference
 		anim = GetComponent<Animator>();
+		// sprite reference
+		sprite = GetComponent<SpriteRenderer>();
 	}
 
 	void Update ()
@@ -58,9 +62,13 @@ public class Player : MonoBehaviour {
 		Vector2 input = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
 		int wallDirX = (controller.collisions.left) ? -1 : 1;
 
+
 		float targetVelocityX = input.x * moveSpeed;
-		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, ((controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne));
-		//velocity.y += gravity * Time.deltaTime;
+
+		// damping the x speed... doesn't feel very platformer-ish or fit with animations...
+//		velocity.x = Mathf.SmoothDamp (velocity.x, targetVelocityX, ref velocityXSmoothing, ((controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne));
+		velocity.x = targetVelocityX;
+
 
 		bool wallSliding = false;
 		if ((controller.collisions.left || controller.collisions.right) && !controller.collisions.below && velocity.y < 0) {
@@ -135,17 +143,31 @@ public class Player : MonoBehaviour {
 		velocity.y += gravity * Time.deltaTime;
 		controller.Move (velocity * Time.deltaTime, input);
 
-		Debug.Log ("isWalking?????????????????" + controller.collisions.walkingRight);
 
-		if (controller.collisions.walkingLeft || controller.collisions.walkingRight) {
+		if (Math.Sign (velocity.x) < 0) {
 			anim.SetBool ("isWalking", true);
-		} else {
+			sprite.flipX = false;
+		} else if (Math.Sign (velocity.x) > 0) {
+			anim.SetBool ("isWalking", true);
+			sprite.flipX = true;
+		}
+		if (Math.Abs (velocity.x) < minWalkSpeed) {
 			anim.SetBool ("isWalking", false);
+//			velocity.x = 0;
 		}
 
 		if (controller.collisions.above || controller.collisions.below) {
 			velocity.y = 0;
 		}
+
+		if (controller.collisions.above || controller.collisions.below) {
+			anim.SetBool ("grounded", true);
+		} else {
+			anim.SetBool ("grounded", false);
+		}
+
+		Debug.Log ("jumping?????????????????------------------------:   " + velocity.y);
+		anim.SetFloat("vSpeed", velocity.y);
 //		Debug.Log("----------> collisions above..... " + controller.collisions.above);
 	}
 }

@@ -191,7 +191,7 @@ Transform:
   m_LocalScale: {x: 4.0744367, y: 0.54326427, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 14
 --- !u!1 &151177941
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +280,7 @@ Transform:
   m_LocalScale: {x: 0.494939, y: 1.5970118, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 15
 --- !u!1 &321822180
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,7 +357,7 @@ Transform:
   m_LocalScale: {x: 0.3697157, y: 3.6298497, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
 --- !u!1 &360681332
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,7 +434,7 @@ Transform:
   m_LocalScale: {x: 14.976932, y: 0.5506937, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
 --- !u!1 &399474985
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,8 +467,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c95e2eb2b459f49d4aa0e68404bd3d69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxJumpHeight: 4
-  minJumpHeight: 1
+  maxJumpHeight: 1
+  minJumpHeight: 0.1
   timeToJumpApex: 0.4
   wallSlideSpeedMax: 3
   wallJumpClimb: {x: 7.5, y: 16}
@@ -562,11 +562,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 399474985}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.151, y: 13.646, z: 0}
+  m_LocalPosition: {x: -6.09, y: 14.21, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1928320319}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!50 &399474992
 Rigidbody2D:
   serializedVersion: 2
@@ -660,7 +661,7 @@ Transform:
   m_LocalScale: {x: 12.4270315, y: 0.15618826, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
 --- !u!1 &706798638
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,7 +738,7 @@ Transform:
   m_LocalScale: {x: 4.0744367, y: 0.54326427, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
 --- !u!1 &769968018
 GameObject:
   m_ObjectHideFlags: 0
@@ -814,7 +815,7 @@ Transform:
   m_LocalScale: {x: 12.4270315, y: 0.54326427, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
 --- !u!1 &1021992634
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,7 +892,7 @@ Transform:
   m_LocalScale: {x: 12.648906, y: 0.53584975, z: 1.2099534}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
 --- !u!1 &1036078283
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,7 +969,7 @@ Transform:
   m_LocalScale: {x: 14.976932, y: 0.5506937, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
 --- !u!1 &1122677977
 GameObject:
   m_ObjectHideFlags: 0
@@ -1045,7 +1046,7 @@ Transform:
   m_LocalScale: {x: 12.4270315, y: 0.54326427, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
 --- !u!1 &1155785700
 GameObject:
   m_ObjectHideFlags: 0
@@ -1122,7 +1123,7 @@ Transform:
   m_LocalScale: {x: 18.121391, y: 0.6663137, z: 1.2099534}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
 --- !u!1 &1344767055
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,7 +1200,7 @@ Transform:
   m_LocalScale: {x: 2.4693568, y: 0.54326427, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
 --- !u!1 &1871507000
 GameObject:
   m_ObjectHideFlags: 0
@@ -1276,7 +1277,7 @@ Transform:
   m_LocalScale: {x: 14.976932, y: 0.5506937, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
 --- !u!1 &1928320314
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,7 +1327,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.16911763, g: 0.16911763, b: 0.16911763, a: 0.019607844}
+  m_BackGroundColor: {r: 0.18382353, g: 0.18382353, b: 0.18382353, a: 0.019607844}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -1337,7 +1338,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 27.06406
+  orthographic size: 1.8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1358,10 +1359,10 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1928320314}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.68, y: 15.01, z: -10}
+  m_LocalPosition: {x: -0.12, y: -0.1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 399474991}
   m_RootOrder: 0
 --- !u!1 &1933346208
 GameObject:
@@ -1439,7 +1440,7 @@ Transform:
   m_LocalScale: {x: 14.976932, y: 0.5506937, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
 --- !u!1 &1949229028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1547,4 +1548,4 @@ Transform:
   m_LocalScale: {x: 3.5805657, y: 0.54326427, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
